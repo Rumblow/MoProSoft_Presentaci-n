@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MoProSoft Quest</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --dk: #4a2027;
+      --wh: #fff;
+      --ro: #9b6b72;
+      --az: #7fa8d6;
+      --bg: #c9dff5;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    html {
+      scroll-padding-top: 70px;
+      height: 100%
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--dk);
+      font: 22px/1.25 'VT323', monospace;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column
+    }
+
+    h1,
+    h2,
+    h3,
+    .px {
+      font-family: 'Press Start 2P', monospace;
+      line-height: 1.5
+    }
+
+    h1 {
+      font-size: clamp(16px, 4vw, 30px);
+      margin: 0
+    }
+
+    h2 {
+      font-size: clamp(13px, 2.6vw, 18px);
+      margin: 0 0 14px
+    }
+
+    h3 {
+      font-size: 12px;
+      margin: 0
+    }
+
+    nav {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 5;
+      background: var(--dk);
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 8px;
+      justify-content: center
+    }
+
+    nav button {
+      font: 10px 'Press Start 2P', monospace;
+      background: var(--ro);
+      color: var(--wh);
+      border: 3px solid var(--wh);
+      padding: 8px;
+      cursor: pointer
+    }
+
+    nav button:hover {
+      background: var(--az);
+      color: var(--dk)
+    }
+
+    main {
+      max-width: 980px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px
+    }
+
+    section {
+      margin: 0 0 28px;
+      display: none
+    }
+
+    section.on {
+      display: block
+    }
+
+    nav button.act {
+      background: var(--az);
+      color: var(--dk)
+    }
+
+    .box {
+      background: var(--wh);
+      border: 4px solid var(--dk);
+      box-shadow: 6px 6px 0 var(--dk);
+      padding: 14px;
+      margin-bottom: 14px
+    }
+
+    .hero {
+      background: var(--dk);
+      color: var(--wh);
+      text-align: center;
+      padding: 26px 14px;
+      border: 4px solid var(--wh);
+      box-shadow: 6px 6px 0 var(--ro)
+    }
+
+    .hero p {
+      font-size: 26px;
+      margin: 12px 0
+    }
+
+    .btn {
+      font: 11px 'Press Start 2P', monospace;
+      background: var(--az);
+      color: var(--dk);
+      border: 4px solid var(--dk);
+      box-shadow: 4px 4px 0 var(--dk);
+      padding: 10px 12px;
+      cursor: pointer;
+      margin: 4px 6px 4px 0
+    }
+
+    .btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--dk)
+    }
+
+    .btn.alt {
+      background: var(--ro);
+      color: var(--wh)
+    }
+
+    .bar {
+      height: 22px;
+      border: 3px solid var(--dk);
+      background: var(--wh)
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--az);
+      transition: width .4s
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px
+    }
+
+    .lv {
+      background: var(--wh);
+      border: 4px solid var(--dk);
+      box-shadow: 5px 5px 0 var(--dk);
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      color: inherit
+    }
+
+    .lv:hover {
+      background: var(--az)
+    }
+
+    .lv.done {
+      background: var(--ro);
+      color: var(--wh)
+    }
+
+    .lv span {
+      font-size: 30px
+    }
+
+    #det {
+      display: none
+    }
+
+    #det h2 {
+      background: var(--dk);
+      color: var(--wh);
+      padding: 10px
+    }
+
+    #det table {
+      border-collapse: collapse;
+      width: 100%;
+      display: block;
+      overflow-x: auto
+    }
+
+    td,
+    th {
+      border: 3px solid var(--dk);
+      padding: 5px 8px;
+      text-align: left;
+      vertical-align: top
+    }
+
+    th {
+      background: var(--az)
+    }
+
+    .q {
+      border: 3px solid var(--dk);
+      background: var(--wh);
+      padding: 10px;
+      margin-bottom: 10px
+    }
+
+    .q b {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 24px
+    }
+
+    .o {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      background: var(--bg);
+      border: 3px solid var(--dk);
+      padding: 5px 8px;
+      margin: 4px 0;
+      cursor: pointer;
+      color: var(--dk)
+    }
+
+    .o:hover {
+      background: var(--az)
+    }
+
+    .o.sel {
+      background: var(--ro);
+      color: var(--wh)
+    }
+
+    .o.ok {
+      background: #fff;
+      outline: 4px solid var(--az)
+    }
+
+    .o.bad {
+      background: var(--dk);
+      color: var(--wh);
+      text-decoration: line-through
+    }
+
+    input {
+      font: inherit;
+      font-size: 24px;
+      border: 3px solid var(--dk);
+      padding: 4px 8px;
+      background: var(--wh);
+      color: var(--dk)
+    }
+
+    ul {
+      margin: 6px 0;
+      padding-left: 22px
+    }
+
+    footer {
+      margin-top: auto;
+      background: var(--dk);
+      color: var(--wh);
+      text-align: center;
+      padding: 14px;
+      font: 10px 'Press Start 2P', monospace;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px))
+    }
+  </style>
+</head>
+
+<body>
+  <nav id="nav"></nav>
+  <main>
+    <section id="inicio">
+      <div class="hero">
+        <h1>▶ MOPROSOFT QUEST</h1>
+        <p>Modelo de Procesos para la Industria del Software</p>
+        <p style="font-size:20px">Explora 12 niveles, supera la actividad y vence la evaluación final. (A veces escrito
+          “MaProSoft”.)</p>
+        <button class="btn" onclick="go('index')">PRESS START</button>
+      </div>
+    </section>
+
+    <section id="index">
+      <h2>■ ÍNDICE / MAPA</h2>
+      <div class="box">
+        <div class="px" style="font-size:10px">XP: <span id="xp">0</span>/12 niveles</div>
+        <div class="bar"><i id="xpb"></i></div>
+      </div>
+      <div class="grid" id="idx"></div>
+    </section>
+
+    <section id="contenido">
+      <div id="det" class="box"></div>
+    </section>
+
+    <section id="actividad">
+      <h2>★ ACTIVIDAD: MISIÓN DE PRÁCTICA</h2>
+      <div class="box">Responde 10 retos aleatorios con retroalimentación inmediata. Cada recarga o reinicio genera
+        retos distintos.<br>
+        <button class="btn" onclick="startAct()">NUEVA PARTIDA</button>
+      </div>
+      <div id="actq"></div>
+      <div id="actr"></div>
+    </section>
+
+    <section id="evaluacion">
+      <h2>☠ EVALUACIÓN: JEFE FINAL</h2>
+      <div class="box">12 preguntas aleatorias con opciones mezcladas. Verás la nota hasta el final.<br>
+        <button class="btn" onclick="startEv()">NUEVA PARTIDA</button>
+      </div>
+      <div id="evq"></div>
+      <div id="evr"></div>
+    </section>
+  </main>
+  <footer>Hecho por Rum</footer>
+  <script>
+    const $ = i => document.getElementById(i);
+    const sh = a => {a = a.slice(); for (let i = a.length - 1; i > 0; i--) {const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]} return a};
+    let last = 0; const PG = ["inicio", "index", "contenido", "actividad", "evaluacion"];
+    const go = id => {if (!PG.includes(id)) id = "inicio"; PG.forEach(p => {$(p).classList.toggle("on", p == id);}); document.querySelectorAll("nav button").forEach(b => b.classList.toggle("act", b.dataset.p == id)); window.scrollTo(0, 0); try {history.replaceState(null, "", "#" + id)} catch (e) { } };
+    const nv = id => id == "contenido" ? open_(last) : go(id);
+    const CAT = ["Alta Dirección", "Gerencia", "Operación"];
+    const P = [["GN", "Gestión de Negocio", 0, "Define la razón de ser, visión, estrategia y objetivos; vigila el negocio y el portafolio de proyectos."],
+    ["GPR", "Gestión de Procesos", 1, "Define, mantiene y mejora los procesos de la organización y su base de activos."],
+    ["GPY", "Gestión de Proyectos", 1, "Asegura que cada proyecto se planee y ejecute cumpliendo tiempo, costo y alcance."],
+    ["GRE", "Gestión de Recursos", 1, "Provee personas, bienes, servicios, infraestructura y conocimiento; incluye 3 subprocesos."],
+    ["RHAT", "Recursos Humanos y Ambiente de Trabajo", 1, "Subproceso de GRE: personal competente y buen ambiente laboral."],
+    ["BSI", "Bienes, Servicios e Infraestructura", 1, "Subproceso de GRE: adquisición y mantenimiento de bienes, servicios e infraestructura."],
+    ["CO", "Conocimiento de la Organización", 1, "Subproceso de GRE: guarda y comparte el conocimiento y los activos de la empresa."],
+    ["APE", "Administración de Proyectos Específicos", 2, "Planea, realiza, evalúa y cierra cada proyecto de desarrollo o mantenimiento."],
+    ["DMS", "Desarrollo y Mantenimiento de Software", 2, "Construye o modifica el software: requerimientos, diseño, construcción, pruebas y entrega."]];
+    const L = ["Incompleto", "Realizado", "Gestionado", "Establecido", "Predecible", "En optimización"];
+    const LD = ["El proceso no se realiza o no logra su propósito.", "Se logra el propósito, sin control formal.", "Se planea, supervisa y ajusta; hay productos controlados.", "Se usa un proceso definido, adaptado del estándar de la organización.", "Se mide y se controla con datos cuantitativos.", "Se mejora de forma continua con base en metas del negocio."];
+    const C = [
+      ["📜", "¿Qué es MoProSoft?", "<p><b>MoProSoft</b> = <b>Mo</b>delo de <b>Pro</b>cesos para la Industria del <b>Soft</b>ware. Es un modelo mexicano para mejorar y evaluar los procesos de desarrollo y mantenimiento de software, pensado para empresas pequeñas.</p><ul><li>Creado por Hanna Oktaba y su equipo en la Facultad de Ciencias de la UNAM.</li><li>Impulsado por la Secretaría de Economía dentro del programa PROSOFT.</li><li>Con apoyo de la Asociación Mexicana para la Calidad en Ingeniería de Software (AMCIS).</li><li>Se convirtió en la norma mexicana NMX-I-059-NYCE-2005, publicada en el DOF el 15 de agosto de 2005.</li><li>Nota: el nombre correcto es MoProSoft; “MaProSoft” es una variante de escritura.</li></ul>"],
+      ["🕰️", "Contexto e historia", "<ul><li><b>PROSOFT (2002):</b> programa federal para elevar la competitividad de la industria mexicana del software.</li><li><b>Problema:</b> modelos como CMMI eran costosos y complejos para empresas de pocas personas.</li><li><b>2002–2005:</b> diseño del modelo, pruebas piloto en empresas y publicación de la norma.</li><li><b>Después:</b> sus ideas alimentaron COMPETISOFT (proyecto iberoamericano) y la norma internacional ISO/IEC 29110 para entidades muy pequeñas.</li></ul>"],
+      ["🎯", "Objetivos y alcance", "<ul><li>Dar a las pequeñas y medianas empresas un modelo ligero y fácil de adoptar.</li><li>Mejorar la calidad del producto, la predictibilidad de costos y tiempos y la satisfacción del cliente.</li><li>Servir como guía de qué procesos tener, no de cómo programar.</li><li>Permitir evaluar la capacidad de los procesos y certificarla.</li><li>Se apoya en ISO/IEC 12207, ISO/IEC 15504, CMMI, PMBOK y SWEBOK.</li></ul>"],
+      ["🏰", "Estructura: 3 categorías", "<p>MoProSoft organiza <b>9 procesos</b> en tres categorías, como los pisos de un castillo:</p><table><tr><th>Categoría</th><th>Rol</th><th>Procesos</th></tr><tr><td>Alta Dirección</td><td>Estrategia y negocio</td><td>GN</td></tr><tr><td>Gerencia</td><td>Gestiona procesos, proyectos y recursos</td><td>GPR, GPY, GRE (RHAT, BSI, CO)</td></tr><tr><td>Operación</td><td>Hace el trabajo de software</td><td>APE, DMS</td></tr></table><p>Fluyen así: la Alta Dirección fija objetivos, la Gerencia da recursos y procesos, la Operación entrega productos y reporta hacia arriba.</p>"],
+      ["🗺️", "Los 9 procesos", "@P"],
+      ["📦", "Anatomía de un proceso", "<p>Cada proceso se documenta con una estructura fija:</p><ul><li><b>Definición general:</b> categoría, propósito, descripción, objetivos e indicadores.</li><li><b>Entradas, salidas y productos</b> con su estado.</li><li><b>Prácticas:</b> actividades por rol, con flujo de trabajo.</li><li><b>Roles y capacitación</b> requeridos.</li><li><b>Verificaciones y validaciones</b> de calidad.</li><li><b>Guías de ajuste:</b> cómo adaptar el proceso a la empresa.</li><li><b>Referencias</b> a otros modelos y estándares.</li></ul>"],
+      ["⚙️", "Ciclo de DMS", "<p>El proceso de Desarrollo y Mantenimiento de Software sigue seis actividades:</p><ol><li>Inicio</li><li>Requerimientos</li><li>Análisis y diseño</li><li>Construcción</li><li>Integración y pruebas</li><li>Cierre</li></ol><p>Las revisiones y pruebas se hacen en cada paso. APE coordina: planea, da seguimiento y cierra el proyecto con lecciones aprendidas.</p>"],
+      ["👥", "Roles clave", "<ul><li><b>Responsable de Gestión de Negocio:</b> dueño o dirección.</li><li><b>Responsable de Gestión de Procesos:</b> mantiene el catálogo de procesos.</li><li><b>Responsable de Gestión de Proyectos:</b> asigna y vigila proyectos.</li><li><b>Responsable de Proyecto:</b> lidera un proyecto específico.</li><li><b>Analista, Diseñador, Programador, Probador:</b> ejecutan DMS.</li><li><b>Cliente y usuario:</b> validan requerimientos y entregas.</li></ul><p>En empresas pequeñas, una persona puede cumplir varios roles.</p>"],
+      ["📈", "Niveles de capacidad", "@L"],
+      ["🔍", "Evaluación: EvalProSoft", "<ul><li>EvalProSoft es el método para evaluar procesos de MoProSoft, basado en ISO/IEC 15504.</li><li>Lo aplican evaluadores capacitados; la norma se verifica con organismos de certificación como NYCE.</li><li>Resultado: perfil con el nivel de capacidad por proceso y recomendaciones de mejora.</li><li>Etapas generales: preparación, recolección de evidencias, entrevistas, análisis y reporte.</li></ul>"],
+      ["🔗", "Relación con otros modelos", "<table><tr><th>Modelo</th><th>Relación</th></tr><tr><td>CMMI</td><td>Referente internacional; MoProSoft es más ligero.</td></tr><tr><td>ISO/IEC 12207</td><td>Ciclo de vida del software; base del modelo.</td></tr><tr><td>ISO/IEC 15504</td><td>Base de niveles de capacidad y evaluación.</td></tr><tr><td>ISO/IEC 29110</td><td>Norma para entidades muy pequeñas, con influencia de MoProSoft.</td></tr><tr><td>COMPETISOFT</td><td>Proyecto iberoamericano que lo tomó como base.</td></tr><tr><td>Scrum, RUP, XP</td><td>Metodologías técnicas; pueden convivir con MoProSoft.</td></tr></table>"],
+      ["🏆", "Beneficios, retos y glosario", "<p><b>Beneficios:</b> orden en proyectos, menos retrabajo, mejor calidad, credibilidad ante clientes y acceso a mercados.</p><p><b>Retos:</b> cultura de documentar, tiempo y capacitación, apoyo constante de la dirección.</p><p><b>Glosario:</b> <b>Proceso</b> = conjunto de actividades con un propósito. <b>Capacidad</b> = qué tan bien se ejecuta un proceso. <b>PYME</b> = pequeña y mediana empresa. <b>Norma</b> = documento oficial de referencia. <b>Indicador</b> = medida para saber si se logra un objetivo.</p>"]];
+    const seen = new Set();
+    $("nav").innerHTML = [["inicio", "INICIO"], ["index", "ÍNDICE"], ["contenido", "CONTENIDO"], ["actividad", "ACTIVIDAD"], ["evaluacion", "EVALUACIÓN"]].map(a => `<button data-p="${a[0]}" onclick="nv('${a[0]}')">${a[1]}</button>`).join("");
+    $("idx").innerHTML = C.map((c, i) => `<button class="lv" id="lv${i}" onclick="open_(${i})"><span>${c[0]}</span><div class="px" style="font-size:9px;margin:6px 0">NIVEL ${i + 1}</div>${c[1]}</button>`).join("");
+    function open_(i) {
+      seen.add(i); last = i; let b = C[i][2];
+      if (b == "@P") b = "<table><tr><th>Sigla</th><th>Proceso</th><th>Categoría</th><th>Propósito</th></tr>" + P.map(p => `<tr><td>${p[0]}</td><td>${p[1]}</td><td>${CAT[p[2]]}</td><td>${p[3]}</td></tr>`).join("") + "</table>";
+      if (b == "@L") b = "<p>Basados en ISO/IEC 15504, son 6 niveles (0 a 5):</p><table><tr><th>Nivel</th><th>Nombre</th><th>Significado</th></tr>" + L.map((l, k) => `<tr><td>${k}</td><td>${l}</td><td>${LD[k]}</td></tr>`).join("") + "</table>";
+      const d = $("det"); d.style.display = "block";
+      d.innerHTML = `<h2>${C[i][0]} NIVEL ${i + 1}: ${C[i][1]}</h2>${b}<p><button class="btn alt" onclick="go('index')">▤ ÍNDICE</button>${i > 0 ? `<button class="btn alt" onclick="open_(${i - 1})">◀ ANTERIOR</button>` : ""}${i < C.length - 1 ? `<button class="btn" onclick="open_(${i + 1})">SIGUIENTE ▶</button>` : `<button class="btn" onclick="go('actividad')">IR A LA ACTIVIDAD ▶</button>`}</p>`;
+      $("lv" + i).classList.add("done"); $("xp").textContent = seen.size; $("xpb").style.width = (seen.size / 12 * 100) + "%"; go("contenido")
+    }
+    function hv() {const h = location.hash.slice(1); if (h == "contenido") open_(last); else go(h)}
+    const mk = (q, a, w) => {const o = sh([a, ...w]); return {q, o, a: o.indexOf(a), c: -1}};
+    function actPool() {
+      const r = [];
+      P.forEach(p => {
+        r.push(mk(`¿En qué categoría está ${p[0]} (${p[1]})?`, CAT[p[2]], CAT.filter((_, k) => k != p[2])));
+        r.push(mk(`¿Qué significa la sigla ${p[0]}?`, p[1], sh(P.filter(x => x != p)).slice(0, 3).map(x => x[1])))
+      });
+      L.forEach((l, k) => {
+        r.push(mk(`¿Cómo se llama el nivel de capacidad ${k}?`, l, sh(L.filter(x => x != l)).slice(0, 3)));
+        r.push(mk(`“${LD[k]}” describe el nivel…`, l, sh(L.filter(x => x != l)).slice(0, 3)))
+      });
+      const ph = ["Inicio", "Requerimientos", "Análisis y diseño", "Construcción", "Integración y pruebas", "Cierre"];
+      ph.forEach((f, k) => {if (k < 5) r.push(mk(`En DMS, ¿qué actividad sigue después de “${f}”?`, ph[k + 1], ph.filter(x => x != ph[k + 1] && x != f).slice(0, 3)))});
+      return r
+    }
+    const E = [["¿Qué significa MoProSoft?", "Modelo de Procesos para la Industria del Software", "Modelo de Programación de Software", "Método de Productos de Software", "Manual de Proyectos Softwareros"],
+    ["¿Quién lideró el desarrollo de MoProSoft?", "Hanna Oktaba", "Watts Humphrey", "Ivar Jacobson", "Linus Torvalds"],
+    ["¿Qué institución académica lo desarrolló?", "UNAM", "IPN", "ITESM", "UAM"],
+    ["¿Qué programa federal lo impulsó?", "PROSOFT", "PROMEXICO", "CONACYT-Soft", "SOFTMEX"],
+    ["¿Qué dependencia solicitó el modelo?", "Secretaría de Economía", "Secretaría de Salud", "SEP", "SAT"],
+    ["¿En qué año se declaró norma mexicana?", "2005", "1998", "2010", "2015"],
+    ["¿Cuántas categorías tiene?", "3", "2", "4", "9"],
+    ["¿Cuántos procesos incluye en total?", "9", "3", "6", "12"],
+    ["¿A qué categoría pertenece GN?", "Alta Dirección", "Gerencia", "Operación", "Soporte"],
+    ["¿Qué significa DMS?", "Desarrollo y Mantenimiento de Software", "Diseño y Medición de Sistemas", "Dirección y Mejora de Soporte", "Datos y Modelos de Software"],
+    ["¿A qué categoría pertenece APE?", "Operación", "Alta Dirección", "Gerencia", "Calidad"],
+    ["¿Qué subprocesos tiene GRE?", "RHAT, BSI y CO", "GN, GPR y GPY", "APE y DMS", "PMO, QA y TI"],
+    ["¿Qué significa BSI?", "Bienes, Servicios e Infraestructura", "Base de Soluciones Integradas", "Beneficios, Seguridad e Información", "Bitácora de Sistemas Internos"],
+    ["¿Cómo se llama el nivel de capacidad 2?", "Gestionado", "Realizado", "Establecido", "Predecible"],
+    ["¿Cómo se llama el nivel de capacidad 0?", "Incompleto", "Inicial", "Nulo", "Básico"],
+    ["¿Qué nivel de capacidad es el más alto?", "5, En optimización", "3, Establecido", "4, Gestionado", "6, Perfecto"],
+    ["¿En qué norma se basan los niveles de capacidad?", "ISO/IEC 15504", "ISO 14001", "ISO 27001", "IEEE 830"],
+    ["¿Qué organismo se asocia con la certificación de la norma?", "NYCE", "INEGI", "IMSS", "CFE"],
+    ["¿Qué norma internacional para entidades muy pequeñas se relaciona con MoProSoft?", "ISO/IEC 29110", "ISO 9000-3", "ISO 26262", "ISO/IEC 27002"],
+    ["¿A qué público está dirigido principalmente?", "Pequeñas empresas de software", "Solo grandes corporativos", "Universidades", "Bancos"],
+    ["¿Qué proceso mejora y mantiene los procesos de la organización?", "GPR", "GPY", "APE", "CO"],
+    ["¿Qué proceso planea y cierra proyectos específicos?", "APE", "GN", "BSI", "RHAT"],
+    ["¿Qué proyecto iberoamericano tomó como base MoProSoft?", "COMPETISOFT", "IBEROSOFT", "SOFTLATAM", "CYTEDWARE"],
+    ["¿Cuál NO es una categoría de MoProSoft?", "Soporte", "Alta Dirección", "Gerencia", "Operación"],
+    ["¿Qué significa CO?", "Conocimiento de la Organización", "Control Operativo", "Comunicación Oficial", "Costos y Objetivos"],
+    ["¿Qué significa RHAT?", "Recursos Humanos y Ambiente de Trabajo", "Registro Histórico de Actividades", "Responsables de Hardware y Terminales", "Reportes de Horas y Tareas"],
+    ["¿Cuál es un modelo internacional comparable más pesado?", "CMMI", "Scrum", "Kanban", "UML"],
+    ["¿MoProSoft sustituye a metodologías como Scrum o RUP?", "No, define procesos y puede convivir con ellas", "Sí, las elimina", "Solo reemplaza a Scrum", "Solo reemplaza a RUP"],
+    ["¿Qué proceso define la razón de ser y la estrategia del negocio?", "GN", "DMS", "GRE", "APE"],
+    ["¿Qué es EvalProSoft?", "Método para evaluar procesos de MoProSoft", "Un lenguaje de programación", "Una herramienta de diseño", "Un curso de certificación en línea"],
+    ["¿Qué actividad de DMS va justo antes de Construcción?", "Análisis y diseño", "Cierre", "Inicio", "Integración y pruebas"],
+    ["¿Cuántos niveles de capacidad existen (0 a 5)?", "6", "5", "4", "10"]];
+    let R = {};
+    function render(box, items, instant, key, title) {
+      const c = $(box); c.innerHTML = ""; R[key] = {items, title};
+      items.forEach((it, i) => {
+        const d = document.createElement("div"); d.className = "q";
+        d.innerHTML = `<b>${i + 1}. ${it.q}</b>`;
+        it.o.forEach((t, k) => {
+          const b = document.createElement("button"); b.className = "o"; b.textContent = t;
+          b.onclick = () => {
+            if (it.lock) return; it.c = k;
+            if (instant) {it.lock = 1;[...d.querySelectorAll(".o")].forEach((x, n) => {if (n == it.a) x.classList.add("ok"); else if (n == k) x.classList.add("bad")})}
+            else[...d.querySelectorAll(".o")].forEach((x, n) => x.classList.toggle("sel", n == k))
+          };
+          d.appendChild(b)
+        }); c.appendChild(d)
+      });
+      const f = document.createElement("div"); f.className = "box";
+      f.innerHTML = `Tu nombre: <input id="n${key}" maxlength="40" placeholder="Jugador 1"> <button class="btn" onclick="fin('${key}',${instant})">TERMINAR</button>`; c.appendChild(f)
+    }
+    function startAct() {$("actr").innerHTML = ""; render("actq", sh(actPool()).slice(0, 10), true, "act", "Actividad MoProSoft")}
+    function startEv() {$("evr").innerHTML = ""; render("evq", sh(E).slice(0, 12).map(e => mk(e[0], e[1], e.slice(2))), false, "ev", "Evaluación MoProSoft")}
+    function fin(key, instant) {
+      const r = R[key], ok = r.items.filter(x => x.c == x.a).length, n = r.items.length;
+      const nm = ($("n" + key).value || "Jugador").trim(); r.name = nm; r.ok = ok;
+      if (!instant) {const qs = [...$("evq").querySelectorAll(".q")]; qs.forEach((d, i) => {const it = r.items[i]; it.lock = 1;[...d.querySelectorAll(".o")].forEach((x, k) => {x.classList.remove("sel"); if (k == it.a) x.classList.add("ok"); else if (k == it.c) x.classList.add("bad")})})}
+      const g = Math.round(ok / n * 100), msg = g >= 80 ? "¡LEYENDA! Dominas MoProSoft." : g >= 60 ? "¡Buen juego! Repasa algunos niveles." : "Sigue entrenando: revisa el contenido e inténtalo de nuevo.";
+      $(key == "act" ? "actr" : "evr").innerHTML = `<div class="box hero"><h2 style="color:#fff">${nm}: ${ok}/${n} (${g}%)</h2><p>${msg}</p><button class="btn" onclick="pdf('${key}')">⬇ DESCARGAR PDF</button><button class="btn alt" onclick="${key == "act" ? "startAct" : "startEv"}()">REINTENTAR</button></div>`
+    }
+    async function pdf(key) {
+      const r = R[key]; if (!window.jspdf) {alert("No se pudo cargar el generador de PDF."); return }
+      const doc = new window.jspdf.jsPDF({unit: "mm", format: "a4"}); let y = 20;
+      const line = (t, s, b) => {doc.setFont("helvetica", b ? "bold" : "normal"); doc.setFontSize(s); doc.splitTextToSize(t, 175).forEach(l => {if (y > 280) {doc.addPage(); y = 20} doc.text(l, 17, y); y += s * 0.5 + 1.5})};
+      line("MoProSoft Quest - " + r.title, 16, 1); y += 2;
+      line("Jugador: " + r.name, 11); line("Fecha: " + new Date().toLocaleString("es-CO"), 11);
+      line(`Resultado: ${r.ok}/${r.items.length} (${Math.round(r.ok / r.items.length * 100)}%)`, 12, 1); y += 4;
+      r.items.forEach((it, i) => {
+        const good = it.c == it.a; line(`${i + 1}. ${it.q}`, 11, 1);
+        line("Tu respuesta: " + (it.c < 0 ? "(sin responder)" : it.o[it.c]) + (good ? "  [CORRECTA]" : "  [INCORRECTA]"), 10);
+        if (!good) line("Correcta: " + it.o[it.a], 10); y += 3
+      });
+      y += 4; line("Hecho por Rum", 9);
+      const fname = `moprosoft_${key == "act" ? "actividad" : "evaluacion"}.pdf`;
+      try {
+        const dl = window.claude && await window.claude.use("downloads");
+        if (dl) {await dl.save({filename: fname, data: doc.output("blob")})} else doc.save(fname)
+      }
+      catch (e) {if (!e || e.code != "declined") try {doc.save(fname)} catch (_) { } }
+    }
+    startAct(); startEv(); hv(); addEventListener("hashchange", hv);
+  </script>
+</body>
+
+</html>
