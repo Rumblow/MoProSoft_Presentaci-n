@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MoProSoft Quest</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --dk: #4a2027;
+      --wh: #fff;
+      --ro: #9b6b72;
+      --az: #7fa8d6;
+      --bg: #c9dff5;
+      --ok: #2e7d32;
+      --ok-bg: #d7f5d9;
+      --bad: #8b2635;
+      --gold: #f5b82e;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    html {
+      scroll-padding-top: 70px;
+      height: 100%
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--dk);
+      font: 22px/1.25 'VT323', monospace;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column
+    }
+
+    h1,
+    h2,
+    h3,
+    .px {
+      font-family: 'Press Start 2P', monospace;
+      line-height: 1.5
+    }
+
+    h1 {
+      font-size: clamp(16px, 4vw, 30px);
+      margin: 0
+    }
+
+    h2 {
+      font-size: clamp(13px, 2.6vw, 18px);
+      margin: 0 0 14px
+    }
+
+    h3 {
+      font-size: 12px;
+      margin: 0
+    }
+
+    nav {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 10;
+      background: var(--dk);
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 8px;
+      justify-content: center
+    }
+
+    nav button {
+      font: 10px 'Press Start 2P', monospace;
+      background: var(--ro);
+      color: var(--wh);
+      border: 3px solid var(--wh);
+      padding: 8px;
+      cursor: pointer
+    }
+
+    nav button:hover,
+    nav button.act {
+      background: var(--az);
+      color: var(--dk)
+    }
+
+    main {
+      max-width: 980px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px
+    }
+
+    section {
+      margin: 0 0 28px;
+      display: none
+    }
+
+    section.on {
+      display: block
+    }
+
+    .box {
+      background: var(--wh);
+      border: 4px solid var(--dk);
+      box-shadow: 6px 6px 0 var(--dk);
+      padding: 14px;
+      margin-bottom: 14px
+    }
+
+    .hero {
+      background: var(--dk);
+      color: var(--wh);
+      text-align: center;
+      padding: 26px 14px;
+      border: 4px solid var(--wh);
+      box-shadow: 6px 6px 0 var(--ro)
+    }
+
+    .hero p {
+      font-size: 26px;
+      margin: 12px 0
+    }
+
+    .btn {
+      font: 11px 'Press Start 2P', monospace;
+      background: var(--az);
+      color: var(--dk);
+      border: 4px solid var(--dk);
+      box-shadow: 4px 4px 0 var(--dk);
+      padding: 10px 12px;
+      cursor: pointer;
+      margin: 4px 6px 4px 0
+    }
+
+    .btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--dk)
+    }
+
+    .btn.alt {
+      background: var(--ro);
+      color: var(--wh)
+    }
+
+    .btn.gold {
+      background: var(--gold);
+      color: var(--dk)
+    }
+
+    .btn.sm {
+      font-size: 9px;
+      padding: 6px 8px;
+      border-width: 3px;
+      box-shadow: 2px 2px 0 var(--dk)
+    }
+
+    .bar {
+      height: 22px;
+      border: 3px solid var(--dk);
+      background: var(--wh);
+      position: relative;
+      overflow: hidden
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--az);
+      transition: width .4s
+    }
+
+    .bar.boss i {
+      background: #d94e5a
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px
+    }
+
+    .lv {
+      background: var(--wh);
+      border: 4px solid var(--dk);
+      box-shadow: 5px 5px 0 var(--dk);
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      color: inherit
+    }
+
+    .lv:hover {
+      background: var(--az)
+    }
+
+    .lv.done {
+      background: var(--ro);
+      color: var(--wh)
+    }
+
+    .lv span {
+      font-size: 30px
+    }
+
+    #det {
+      display: none
+    }
+
+    #det h2 {
+      background: var(--dk);
+      color: var(--wh);
+      padding: 10px
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto
+    }
+
+    #det table {
+      display: block
+    }
+
+    td,
+    th {
+      border: 3px solid var(--dk);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top
+    }
+
+    th {
+      background: var(--az);
+      color: var(--dk)
+    }
+
+    .q {
+      border: 3px solid var(--dk);
+      background: var(--wh);
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 4px 4px 0 var(--dk)
+    }
+
+    .q-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px
+    }
+
+    .q-badge {
+      font: 9px 'Press Start 2P', monospace;
+      background: var(--dk);
+      color: var(--wh);
+      padding: 4px 7px;
+      border: 2px solid var(--dk)
+    }
+
+    .q b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 24px
+    }
+
+    .o {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      background: var(--bg);
+      border: 3px solid var(--dk);
+      padding: 6px 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      color: var(--dk)
+    }
+
+    .o:hover {
+      background: var(--az)
+    }
+
+    .o.sel {
+      background: var(--ro);
+      color: var(--wh)
+    }
+
+    .o.ok {
+      background: var(--ok-bg);
+      outline: 4px solid var(--ok);
+      font-weight: bold
+    }
+
+    .o.bad {
+      background: var(--dk);
+      color: var(--wh);
+      text-decoration: line-through
+    }
+
+    /* HUD */
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+      background: var(--dk);
+      color: var(--wh);
+      padding: 10px 12px;
+      border: 4px solid var(--dk);
+      box-shadow: 6px 6px 0 var(--ro);
+      margin-bottom: 14px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      position: sticky;
+      top: 52px;
+      z-index: 6
+    }
+
+    .hud div {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .hud span.val {
+      color: var(--gold);
+      font-size: 12px
+    }
+
+    /* Clasificar (Drag & Drop / Tap) */
+    .cls-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+      background: var(--bg);
+      border: 3px dashed var(--dk);
+      min-height: 54px;
+      margin-bottom: 10px
+    }
+
+    .chip {
+      font: 20px 'VT323', monospace;
+      background: var(--wh);
+      color: var(--dk);
+      border: 3px solid var(--dk);
+      box-shadow: 3px 3px 0 var(--dk);
+      padding: 4px 10px;
+      cursor: grab;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .chip:hover {
+      background: var(--az)
+    }
+
+    .chip.active-chip {
+      background: var(--gold);
+      outline: 3px solid var(--dk);
+      transform: translate(-1px, -1px)
+    }
+
+    .chip.ok-chip {
+      background: var(--ok-bg);
+      border-color: var(--ok)
+    }
+
+    .chip.bad-chip {
+      background: var(--dk);
+      color: var(--wh);
+      text-decoration: line-through
+    }
+
+    .cls-zones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px
+    }
+
+    .cls-zone {
+      border: 3px solid var(--dk);
+      background: #f5f9ff;
+      padding: 8px;
+      min-height: 110px;
+      cursor: pointer;
+      transition: background .15s
+    }
+
+    .cls-zone.drag-over {
+      background: var(--az)
+    }
+
+    .cls-zone-title {
+      font: 10px 'Press Start 2P', monospace;
+      background: var(--dk);
+      color: var(--wh);
+      padding: 6px;
+      margin: -8px -8px 8px -8px;
+      text-align: center
+    }
+
+    .cls-zone-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 60px
+    }
+
+    /* Ordenar Secuencia */
+    .ord-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .ord-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      border: 3px solid var(--dk);
+      padding: 6px 10px;
+      gap: 8px
+    }
+
+    .ord-item.ok-ord {
+      background: var(--ok-bg);
+      border-color: var(--ok)
+    }
+
+    .ord-item.bad-ord {
+      background: var(--dk);
+      color: var(--wh)
+    }
+
+    .ord-num {
+      font: 11px 'Press Start 2P', monospace;
+      background: var(--dk);
+      color: var(--wh);
+      padding: 4px 7px;
+      min-width: 28px;
+      text-align: center
+    }
+
+    .ord-btns {
+      display: flex;
+      gap: 4px
+    }
+
+    .ord-btns button {
+      font: 11px 'Press Start 2P', monospace;
+      background: var(--wh);
+      color: var(--dk);
+      border: 2px solid var(--dk);
+      padding: 4px 8px;
+      cursor: pointer
+    }
+
+    .ord-btns button:hover {
+      background: var(--az)
+    }
+
+    /* Acrónimo / Completar */
+    .acr-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px
+    }
+
+    .acr-hint {
+      font-size: 20px;
+      color: var(--ro);
+      margin-top: 6px
+    }
+
+    /* Verdadero / Falso */
+    .tf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    input {
+      font: inherit;
+      font-size: 24px;
+      border: 3px solid var(--dk);
+      padding: 4px 8px;
+      background: var(--wh);
+      color: var(--dk)
+    }
+
+    ul {
+      margin: 6px 0;
+      padding-left: 22px
+    }
+
+    /* Tabla TOP */
+    .top-wrap {
+      overflow-x: auto
+    }
+
+    .top-table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    .top-table th {
+      font: 10px 'Press Start 2P', monospace;
+      padding: 10px 8px
+    }
+
+    .top-table tr:nth-child(even) {
+      background: #eef6ff
+    }
+
+    .top-table tr.me-row {
+      background: #fff3c4;
+      font-weight: bold
+    }
+
+    .badge-mode {
+      font: 8px 'Press Start 2P', monospace;
+      padding: 3px 6px;
+      border: 2px solid var(--dk);
+      display: inline-block
+    }
+
+    .badge-ev {
+      background: var(--dk);
+      color: var(--wh)
+    }
+
+    .badge-act {
+      background: var(--az);
+      color: var(--dk)
+    }
+
+    .status-pill {
+      font: 9px 'Press Start 2P', monospace;
+      padding: 4px 8px;
+      border: 2px solid var(--dk);
+      background: var(--ok-bg);
+      color: var(--dk);
+      display: inline-block
+    }
+
+    footer {
+      margin-top: auto;
+      background: var(--dk);
+      color: var(--wh);
+      text-align: center;
+      padding: 14px;
+      font: 10px 'Press Start 2P', monospace;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px))
+    }
+  </style>
+</head>
+
+<body>
+  <nav id="nav"></nav>
+  <main>
+    <section id="inicio">
+      <div class="hero">
+        <h1>▶ MOPROSOFT QUEST</h1>
+        <p>Modelo de Procesos para la Industria del Software</p>
+        <p style="font-size:20px">Explora 12 niveles, domina minijuegos interactivos (clasificar, ordenar, descifrar siglas, V/F y retos) y compite en el TOP global.</p>
+        <div style="margin:14px 0">
+          <label style="font-size:22px">👤 Tu Alias de Jugador: </label>
+          <input id="globalName" maxlength="30" placeholder="Jugador 1" style="max-width:220px" oninput="saveAlias(this.value)">
+        </div>
+        <button class="btn" onclick="go('index')">PRESS START</button>
+        <button class="btn gold" onclick="go('top')">🏆 VER TOP RANKING</button>
+      </div>
+    </section>
+
+    <section id="index">
+      <h2>■ ÍNDICE / MAPA</h2>
+      <div class="box">
+        <div class="px" style="font-size:10px">XP DE EXPLORACIÓN: <span id="xp">0</span>/12 niveles</div>
+        <div class="bar"><i id="xpb"></i></div>
+      </div>
+      <div class="grid" id="idx"></div>
+    </section>
+
+    <section id="contenido">
+      <div id="det" class="box"></div>
+    </section>
+
+    <section id="actividad">
+      <h2>★ ACTIVIDAD: MISIÓN DE PRÁCTICA</h2>
+      <div class="box">
+        Supera <b>8 retos variados</b> (Clasificar en el castillo, Ordenar secuencias, Descifrar siglas, V/F y Opción Múltiple) con retroalimentación inmediata, racha y bonus de tiempo.<br>
+        <button class="btn" onclick="startAct()">🎮 NUEVA MISIÓN</button>
+        <button class="btn gold" onclick="go('top')">🏆 RANKING</button>
+      </div>
+      <div class="hud" id="hud-act">
+        <div>⏱️ TIEMPO: <span class="val" id="t-act">00:00</span></div>
+        <div>🔥 RACHA: <span class="val" id="s-act">x0</span></div>
+        <div>⭐ PUNTOS: <span class="val" id="p-act">0</span></div>
+        <div>✅ PROGRESO: <span class="val" id="pr-act">0/8</span></div>
+      </div>
+      <div id="actq"></div>
+      <div id="actr"></div>
+    </section>
+
+    <section id="evaluacion">
+      <h2>☠ EVALUACIÓN: JEFE FINAL</h2>
+      <div class="box">
+        Enfrenta al <b>Jefe Final de MoProSoft</b> con <b>12 desafíos combinados</b>. Tus respuestas se califican al entregar para calcular tu puntuación final, bonus de velocidad y posición en el <b>TOP Global</b>.<br>
+        <button class="btn" onclick="startEv()">⚔️ NUEVA BATALLA</button>
+        <button class="btn gold" onclick="go('top')">🏆 RANKING</button>
+      </div>
+      <div class="hud" id="hud-ev">
+        <div>⏱️ TIEMPO: <span class="val" id="t-ev">00:00</span></div>
+        <div>👾 JEFE HP: <span class="val" id="hp-ev">100%</span></div>
+        <div>⭐ POTENCIAL: <span class="val" id="p-ev">2500</span></div>
+      </div>
+      <div class="box" style="padding:8px 12px">
+        <div class="px" style="font-size:9px;margin-bottom:4px">👾 CAOS DE PROCESOS (HP DEL JEFE SEGÚN RETOS RESPONDIDOS)</div>
+        <div class="bar boss"><i id="boss-bar" style="width:100%"></i></div>
+      </div>
+      <div id="evq"></div>
+      <div id="evr"></div>
+    </section>
+
+    <section id="top">
+      <h2>🏆 TOP PARTICIPANTES / SALÓN DE LA FAMA</h2>
+      <div class="box">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <div>
+            <button class="btn sm" id="f-all" onclick="loadTop('all')">🌐 TODOS</button>
+            <button class="btn sm alt" id="f-ev" onclick="loadTop('ev')">☠ JEFE FINAL</button>
+            <button class="btn sm alt" id="f-act" onclick="loadTop('act')">★ PRÁCTICA</button>
+          </div>
+          <div>
+            <span id="db-status" class="status-pill">Conectando...</span>
+            <button class="btn sm" onclick="loadTop(curTopFilter)">↻ ACTUALIZAR</button>
+          </div>
+        </div>
+        <p style="margin:4px 0 10px;font-size:20px">Puntuación = Aciertos + Bonus de Racha 🔥 + Bonus de Velocidad ⏱️.</p>
+        <div class="top-wrap" id="top-list">Cargando tabla de posiciones...</div>
+      </div>
+    </section>
+  </main>
+  <footer>Hecho por Rum · MoProSoft Quest 2.0</footer>
+
+  <script>
+    const $ = i => document.getElementById(i);
+    const sh = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]] } return a };
+    let last = 0;
+    const PG = ["inicio", "index", "contenido", "actividad", "evaluacion", "top"];
+
+    // Alias persistente
+    let playerAlias = localStorage.getItem("moprosoft_alias") || "";
+    function saveAlias(v) {
+      playerAlias = v.trim();
+      localStorage.setItem("moprosoft_alias", playerAlias);
+      ["nact", "nev"].forEach(id => { if ($(id) && !$(id).value) $(id).value = playerAlias; });
+    }
+
+    const go = id => {
+      if (!PG.includes(id)) id = "inicio";
+      PG.forEach(p => { $(p).classList.toggle("on", p == id); });
+      document.querySelectorAll("nav button").forEach(b => b.classList.toggle("act", b.dataset.p == id));
+      window.scrollTo(0, 0);
+      if (id === "top") loadTop(curTopFilter);
+      try { history.replaceState(null, "", "#" + id) } catch (e) { }
+    };
+    const nv = id => id == "contenido" ? open_(last) : go(id);
+
+    const CAT = ["Alta Dirección", "Gerencia", "Operación"];
+    const P = [
+      ["GN", "Gestión de Negocio", 0, "Define la razón de ser, visión, estrategia y objetivos; vigila el negocio y el portafolio de proyectos."],
+      ["GPR", "Gestión de Procesos", 1, "Define, mantiene y mejora los procesos de la organización y su base de activos."],
+      ["GPY", "Gestión de Proyectos", 1, "Asegura que cada proyecto se planee y ejecute cumpliendo tiempo, costo y alcance."],
+      ["GRE", "Gestión de Recursos", 1, "Provee personas, bienes, servicios, infraestructura y conocimiento; incluye 3 subprocesos."],
+      ["RHAT", "Recursos Humanos y Ambiente de Trabajo", 1, "Subproceso de GRE: personal competente y buen ambiente laboral."],
+      ["BSI", "Bienes, Servicios e Infraestructura", 1, "Subproceso de GRE: adquisición y mantenimiento de bienes, servicios e infraestructura."],
+      ["CO", "Conocimiento de la Organización", 1, "Subproceso de GRE: guarda y comparte el conocimiento y los activos de la empresa."],
+      ["APE", "Administración de Proyectos Específicos", 2, "Planea, realiza, evalúa y cierra cada proyecto de desarrollo o mantenimiento."],
+      ["DMS", "Desarrollo y Mantenimiento de Software", 2, "Construye o modifica el software: requerimientos, diseño, construcción, pruebas y entrega."]
+    ];
+    const L = ["Incompleto", "Realizado", "Gestionado", "Establecido", "Predecible", "En optimización"];
+    const LD = [
+      "El proceso no se realiza o no logra su propósito.",
+      "Se logra el propósito, sin control formal.",
+      "Se planea, supervisa y ajusta; hay productos controlados.",
+      "Se usa un proceso definido, adaptado del estándar de la organización.",
+      "Se mide y se controla con datos cuantitativos.",
+      "Se mejora de forma continua con base en metas del negocio."
+    ];
+    const C = [
+      ["📜", "¿Qué es MoProSoft?", "<p><b>MoProSoft</b> = <b>Mo</b>delo de <b>Pro</b>cesos para la Industria del <b>Soft</b>ware. Es un modelo mexicano para mejorar y evaluar los procesos de desarrollo y mantenimiento de software, pensado para empresas pequeñas.</p><ul><li>Creado por Hanna Oktaba y su equipo en la Facultad de Ciencias de la UNAM.</li><li>Impulsado por la Secretaría de Economía dentro del programa PROSOFT.</li><li>Con apoyo de la Asociación Mexicana para la Calidad en Ingeniería de Software (AMCIS).</li><li>Se convirtió en la norma mexicana NMX-I-059-NYCE-2005, publicada en el DOF el 15 de agosto de 2005.</li><li>Nota: el nombre correcto es MoProSoft; “MaProSoft” es una variante de escritura.</li></ul>"],
+      ["🕰️", "Contexto e historia", "<ul><li><b>PROSOFT (2002):</b> programa federal para elevar la competitividad de la industria mexicana del software.</li><li><b>Problema:</b> modelos como CMMI eran costosos y complejos para empresas de pocas personas.</li><li><b>2002–2005:</b> diseño del modelo, pruebas piloto en empresas y publicación de la norma.</li><li><b>Después:</b> sus ideas alimentaron COMPETISOFT (proyecto iberoamericano) y la norma internacional ISO/IEC 29110 para entidades muy pequeñas.</li></ul>"],
+      ["🎯", "Objetivos y alcance", "<ul><li>Dar a las pequeñas y medianas empresas un modelo ligero y fácil de adoptar.</li><li>Mejorar la calidad del producto, la predictibilidad de costos y tiempos y la satisfacción del cliente.</li><li>Servir como guía de qué procesos tener, no de cómo programar.</li><li>Permitir evaluar la capacidad de los procesos y certificarla.</li><li>Se apoya en ISO/IEC 12207, ISO/IEC 15504, CMMI, PMBOK y SWEBOK.</li></ul>"],
+      ["🏰", "Estructura: 3 categorías", "<p>MoProSoft organiza <b>9 procesos</b> en tres categorías, como los pisos de un castillo:</p><table><tr><th>Categoría</th><th>Rol</th><th>Procesos</th></tr><tr><td>Alta Dirección</td><td>Estrategia y negocio</td><td>GN</td></tr><tr><td>Gerencia</td><td>Gestiona procesos, proyectos y recursos</td><td>GPR, GPY, GRE (RHAT, BSI, CO)</td></tr><tr><td>Operación</td><td>Hace el trabajo de software</td><td>APE, DMS</td></tr></table><p>Fluyen así: la Alta Dirección fija objetivos, la Gerencia da recursos y procesos, la Operación entrega productos y reporta hacia arriba.</p>"],
+      ["🗺️", "Los 9 procesos", "@P"],
+      ["📦", "Anatomía de un proceso", "<p>Cada proceso se documenta con una estructura fija:</p><ul><li><b>Definición general:</b> categoría, propósito, descripción, objetivos e indicadores.</li><li><b>Entradas, salidas y productos</b> con su estado.</li><li><b>Prácticas:</b> actividades por rol, con flujo de trabajo.</li><li><b>Roles y capacitación</b> requeridos.</li><li><b>Verificaciones y validaciones</b> de calidad.</li><li><b>Guías de ajuste:</b> cómo adaptar el proceso a la empresa.</li><li><b>Referencias</b> a otros modelos y estándares.</li></ul>"],
+      ["⚙️", "Ciclo de DMS", "<p>El proceso de Desarrollo y Mantenimiento de Software sigue seis actividades:</p><ol><li>Inicio</li><li>Requerimientos</li><li>Análisis y diseño</li><li>Construcción</li><li>Integración y pruebas</li><li>Cierre</li></ol><p>Las revisiones y pruebas se hacen en cada paso. APE coordina: planea, da seguimiento y cierra el proyecto con lecciones aprendidas.</p>"],
+      ["👥", "Roles clave", "<ul><li><b>Responsable de Gestión de Negocio:</b> dueño o dirección.</li><li><b>Responsable de Gestión de Procesos:</b> mantiene el catálogo de procesos.</li><li><b>Responsable de Gestión de Proyectos:</b> asigna y vigila proyectos.</li><li><b>Responsable de Proyecto:</b> lidera un proyecto específico.</li><li><b>Analista, Diseñador, Programador, Probador:</b> ejecutan DMS.</li><li><b>Cliente y usuario:</b> validan requerimientos y entregas.</li></ul><p>En empresas pequeñas, una persona puede cumplir varios roles.</p>"],
+      ["📈", "Niveles de capacidad", "@L"],
+      ["🔍", "Evaluación: EvalProSoft", "<ul><li>EvalProSoft es el método para evaluar procesos de MoProSoft, basado en ISO/IEC 15504.</li><li>Lo aplican evaluadores capacitados; la norma se verifica con organismos de certificación como NYCE.</li><li>Resultado: perfil con el nivel de capacidad por proceso y recomendaciones de mejora.</li><li>Etapas generales: preparación, recolección de evidencias, entrevistas, análisis y reporte.</li></ul>"],
+      ["🔗", "Relación con otros modelos", "<table><tr><th>Modelo</th><th>Relación</th></tr><tr><td>CMMI</td><td>Referente internacional; MoProSoft es más ligero.</td></tr><tr><td>ISO/IEC 12207</td><td>Ciclo de vida del software; base del modelo.</td></tr><tr><td>ISO/IEC 15504</td><td>Base de niveles de capacidad y evaluación.</td></tr><tr><td>ISO/IEC 29110</td><td>Norma para entidades muy pequeñas, con influencia de MoProSoft.</td></tr><tr><td>COMPETISOFT</td><td>Proyecto iberoamericano que lo tomó como base.</td></tr><tr><td>Scrum, RUP, XP</td><td>Metodologías técnicas; pueden convivir con MoProSoft.</td></tr></table>"],
+      ["🏆", "Beneficios, retos y glosario", "<p><b>Beneficios:</b> orden en proyectos, menos retrabajo, mejor calidad, credibilidad ante clientes y acceso a mercados.</p><p><b>Retos:</b> cultura de documentar, tiempo y capacitación, apoyo constante de la dirección.</p><p><b>Glosario:</b> <b>Proceso</b> = conjunto de actividades con un propósito. <b>Capacidad</b> = qué tan bien se ejecuta un proceso. <b>PYME</b> = pequeña y mediana empresa. <b>Norma</b> = documento oficial de referencia. <b>Indicador</b> = medida para saber si se logra un objetivo.</p>"]
+    ];
+
+    const seen = new Set();
+    $("nav").innerHTML = [
+      ["inicio", "INICIO"],
+      ["index", "ÍNDICE"],
+      ["contenido", "CONTENIDO"],
+      ["actividad", "ACTIVIDAD"],
+      ["evaluacion", "EVALUACIÓN"],
+      ["top", "🏆 TOP"]
+    ].map(a => `<button data-p="${a[0]}" onclick="nv('${a[0]}')">${a[1]}</button>`).join("");
+
+    $("idx").innerHTML = C.map((c, i) => `<button class="lv" id="lv${i}" onclick="open_(${i})"><span>${c[0]}</span><div class="px" style="font-size:9px;margin:6px 0">NIVEL ${i + 1}</div>${c[1]}</button>`).join("");
+
+    function open_(i) {
+      seen.add(i); last = i; let b = C[i][2];
+      if (b == "@P") b = "<table><tr><th>Sigla</th><th>Proceso</th><th>Categoría</th><th>Propósito</th></tr>" + P.map(p => `<tr><td>${p[0]}</td><td>${p[1]}</td><td>${CAT[p[2]]}</td><td>${p[3]}</td></tr>`).join("") + "</table>";
+      if (b == "@L") b = "<p>Basados en ISO/IEC 15504, son 6 niveles (0 a 5):</p><table><tr><th>Nivel</th><th>Nombre</th><th>Significado</th></tr>" + L.map((l, k) => `<tr><td>${k}</td><td>${l}</td><td>${LD[k]}</td></tr>`).join("") + "</table>";
+      const d = $("det"); d.style.display = "block";
+      d.innerHTML = `<h2>${C[i][0]} NIVEL ${i + 1}: ${C[i][1]}</h2>${b}<p><button class="btn alt" onclick="go('index')">▤ ÍNDICE</button>${i > 0 ? `<button class="btn alt" onclick="open_(${i - 1})">◀ ANTERIOR</button>` : ""}${i < C.length - 1 ? `<button class="btn" onclick="open_(${i + 1})">SIGUIENTE ▶</button>` : `<button class="btn" onclick="go('actividad')">IR A LA ACTIVIDAD ▶</button>`}</p>`;
+      $("lv" + i).classList.add("done"); $("xp").textContent = seen.size; $("xpb").style.width = (seen.size / 12 * 100) + "%"; go("contenido")
+    }
+    function hv() { const h = location.hash.slice(1); if (h == "contenido") open_(last); else go(h) }
+
+    // ==========================================
+    // GENERADORES DE RETOS MULTI-DINÁMICA
+    // ==========================================
+    const mkMC = (q, a, w) => {
+      const o = sh([a, ...w]);
+      return { type: "mc", badge: "🎯 OPCIÓN MÚLTIPLE", pts: 100, q, o, a: o.indexOf(a), c: -1, done: false, isOk: false };
+    };
+
+    const mkTF = (q, isTrue, exp) => ({
+      type: "tf",
+      badge: "⚡ VERDADERO / FALSO",
+      pts: 100,
+      q,
+      o: ["VERDADERO", "FALSO"],
+      a: isTrue ? 0 : 1,
+      exp,
+      c: -1,
+      done: false,
+      isOk: false
+    });
+
+    const mkClassify = (subsetCount = 5) => {
+      const chosen = sh(P).slice(0, subsetCount).map(p => ({
+        code: p[0],
+        name: p[1],
+        cat: p[2],
+        placed: -1
+      }));
+      return {
+        type: "classify",
+        badge: "🏰 CLASIFICAR EN EL CASTILLO",
+        pts: 200,
+        q: "Arrastra o toca cada proceso y ubícalo en su categoría de MoProSoft (Alta Dirección, Gerencia u Operación):",
+        items: chosen,
+        selectedChip: -1,
+        done: false,
+        isOk: false
+      };
+    };
+
+    const ORDER_CHALLENGES = [
+      {
+        q: "Ordena de inicio a fin las 6 actividades del ciclo de Desarrollo y Mantenimiento de Software (DMS):",
+        seq: ["Inicio", "Requerimientos", "Análisis y diseño", "Construcción", "Integración y pruebas", "Cierre"]
+      },
+      {
+        q: "Ordena de menor (Nivel 0) a mayor (Nivel 5) los niveles de capacidad de procesos:",
+        seq: ["0 - Incompleto", "1 - Realizado", "2 - Gestionado", "3 - Establecido", "4 - Predecible", "5 - En optimización"]
+      },
+      {
+        q: "Ordena de arriba hacia abajo las 3 categorías de la arquitectura de MoProSoft:",
+        seq: ["Alta Dirección (Estrategia y Negocio)", "Gerencia (Procesos, Proyectos y Recursos)", "Operación (Proyectos Específicos y Desarrollo)"]
+      },
+      {
+        q: "Ordena las 4 etapas generales de una evaluación EvalProSoft:",
+        seq: ["Preparación", "Recolección de evidencias", "Entrevistas", "Análisis y reporte"]
+      }
+    ];
+
+    const mkOrder = (idx) => {
+      const ch = ORDER_CHALLENGES[idx % ORDER_CHALLENGES.length];
+      let cur = sh(ch.seq);
+      if (cur.every((v, i) => v === ch.seq[i])) cur.reverse();
+      return {
+        type: "order",
+        badge: "🔢 ORDENAR SECUENCIA",
+        pts: 180,
+        q: ch.q,
+        target: ch.seq,
+        cur,
+        done: false,
+        isOk: false
+      };
+    };
+
+    const ACR_POOL = [
+      ["GN", "Gestión de Negocio: define la razón de ser, estrategia y portafolio de la organización."],
+      ["GPR", "Gestión de Procesos: define, mantiene y mejora los procesos de la organización."],
+      ["GPY", "Gestión de Proyectos: asegura que los proyectos cumplan tiempo, costo y alcance."],
+      ["GRE", "Gestión de Recursos: provee capital humano, infraestructura y conocimiento."],
+      ["RHAT", "Subproceso de GRE enfocado en personal competente y buen ambiente laboral."],
+      ["BSI", "Subproceso de GRE para adquirir y mantener Bienes, Servicios e Infraestructura."],
+      ["CO", "Subproceso de GRE que resguarda el Conocimiento de la Organización."],
+      ["APE", "Administración de Proyectos Específicos (planea, controla y cierra un proyecto)."],
+      ["DMS", "Proceso de Operación encargado de requerimientos, diseño, código y pruebas."],
+      ["NYCE", "Organismo mexicano encargado de la normalización y certificación de MoProSoft."],
+      ["UNAM", "Universidad donde Hanna Oktaba y su equipo desarrollaron MoProSoft."],
+      ["CMMI", "Modelo internacional más robusto y pesado frente al cual MoProSoft es una alternativa ligera."]
+    ];
+
+    const mkAcronym = (item) => ({
+      type: "acronym",
+      badge: "⌨️ DESCIFRAR SIGLA",
+      pts: 150,
+      q: `Escribe la sigla exacta (${item[0].length} letras): ${item[1]}`,
+      ans: item[0],
+      val: "",
+      hintUsed: false,
+      done: false,
+      isOk: false
+    });
+
+    const TF_POOL = [
+      ["MoProSoft fue diseñado pensando principalmente en las pequeñas y medianas empresas (PYMES) de software.", true],
+      ["MoProSoft prohíbe el uso de metodologías ágiles como Scrum o XP.", false],
+      ["El proceso GN (Gestión de Negocio) pertenece a la categoría de Alta Dirección.", true],
+      ["Los niveles de capacidad de MoProSoft van del 1 al 10.", false],
+      ["El proceso GRE incluye tres subprocesos: RHAT, BSI y CO.", true],
+      ["El nivel 0 de capacidad se llama 'Incompleto' y el nivel 5 se llama 'En optimización'.", true],
+      ["DMS pertenece a la categoría de Gerencia.", false],
+      ["MoProSoft influyó en la creación del estándar internacional ISO/IEC 29110 para entidades muy pequeñas.", true]
+    ];
+
+    const E_MC = [
+      ["¿Qué significa MoProSoft?", "Modelo de Procesos para la Industria del Software", "Modelo de Programación de Software", "Método de Productos de Software", "Manual de Proyectos Softwareros"],
+      ["¿Quién lideró el desarrollo de MoProSoft?", "Hanna Oktaba", "Watts Humphrey", "Ivar Jacobson", "Linus Torvalds"],
+      ["¿Qué institución académica lo desarrolló?", "UNAM", "IPN", "ITESM", "UAM"],
+      ["¿Qué programa federal lo impulsó?", "PROSOFT", "PROMEXICO", "CONACYT-Soft", "SOFTMEX"],
+      ["¿Qué dependencia solicitó el modelo?", "Secretaría de Economía", "Secretaría de Salud", "SEP", "SAT"],
+      ["¿En qué año se declaró norma mexicana?", "2005", "1998", "2010", "2015"],
+      ["¿Cuántas categorías tiene?", "3", "2", "4", "9"],
+      ["¿Cuántos procesos incluye en total?", "9", "3", "6", "12"],
+      ["¿A qué categoría pertenece GN?", "Alta Dirección", "Gerencia", "Operación", "Soporte"],
+      ["¿Qué significa DMS?", "Desarrollo y Mantenimiento de Software", "Diseño y Medición de Sistemas", "Dirección y Mejora de Soporte", "Datos y Modelos de Software"],
+      ["¿A qué categoría pertenece APE?", "Operación", "Alta Dirección", "Gerencia", "Calidad"],
+      ["¿Qué subprocesos tiene GRE?", "RHAT, BSI y CO", "GN, GPR y GPY", "APE y DMS", "PMO, QA y TI"],
+      ["¿Qué significa BSI?", "Bienes, Servicios e Infraestructura", "Base de Soluciones Integradas", "Beneficios, Seguridad e Información", "Bitácora de Sistemas Internos"],
+      ["¿Cómo se llama el nivel de capacidad 2?", "Gestionado", "Realizado", "Establecido", "Predecible"],
+      ["¿Cómo se llama el nivel de capacidad 0?", "Incompleto", "Inicial", "Nulo", "Básico"],
+      ["¿Qué nivel de capacidad es el más alto?", "5, En optimización", "3, Establecido", "4, Gestionado", "6, Perfecto"],
+      ["¿En qué norma se basan los niveles de capacidad?", "ISO/IEC 15504", "ISO 14001", "ISO 27001", "IEEE 830"],
+      ["¿Qué organismo se asocia con la certificación de la norma?", "NYCE", "INEGI", "IMSS", "CFE"],
+      ["¿Qué norma internacional para entidades muy pequeñas se relaciona con MoProSoft?", "ISO/IEC 29110", "ISO 9000-3", "ISO 26262", "ISO/IEC 27002"],
+      ["¿A qué público está dirigido principalmente?", "Pequeñas empresas de software", "Solo grandes corporativos", "Universidades", "Bancos"],
+      ["¿Qué proceso mejora y mantiene los procesos de la organización?", "GPR", "GPY", "APE", "CO"],
+      ["¿Qué proceso planea y cierra proyectos específicos?", "APE", "GN", "BSI", "RHAT"],
+      ["¿Qué proyecto iberoamericano tomó como base MoProSoft?", "COMPETISOFT", "IBEROSOFT", "SOFTLATAM", "CYTEDWARE"],
+      ["¿Cuál NO es una categoría de MoProSoft?", "Soporte", "Alta Dirección", "Gerencia", "Operación"],
+      ["¿Qué significa CO?", "Conocimiento de la Organización", "Control Operativo", "Comunicación Oficial", "Costos y Objetivos"],
+      ["¿Qué significa RHAT?", "Recursos Humanos y Ambiente de Trabajo", "Registro Histórico de Actividades", "Responsables de Hardware y Terminales", "Reportes de Horas y Tareas"],
+      ["¿Cuál es un modelo internacional comparable más pesado?", "CMMI", "Scrum", "Kanban", "UML"],
+      ["¿MoProSoft sustituye a metodologías como Scrum o RUP?", "No, define procesos y puede convivir con ellas", "Sí, las elimina", "Solo reemplaza a Scrum", "Solo reemplaza a RUP"],
+      ["¿Qué proceso define la razón de ser y la estrategia del negocio?", "GN", "DMS", "GRE", "APE"],
+      ["¿Qué es EvalProSoft?", "Método para evaluar procesos de MoProSoft", "Un lenguaje de programación", "Una herramienta de diseño", "Un curso de certificación en línea"],
+      ["¿Qué actividad de DMS va justo antes de Construcción?", "Análisis y diseño", "Cierre", "Inicio", "Integración y pruebas"],
+      ["¿Cuántos niveles de capacidad existen (0 a 5)?", "6", "5", "4", "10"]
+    ];
+
+    function buildActItems() {
+      const mcs = [];
+      P.forEach(p => {
+        mcs.push(mkMC(`¿En qué categoría está ${p[0]} (${p[1]})?`, CAT[p[2]], CAT.filter((_, k) => k != p[2])));
+        mcs.push(mkMC(`¿Qué significa la sigla ${p[0]}?`, p[1], sh(P.filter(x => x != p)).slice(0, 3).map(x => x[1])));
+      });
+      L.forEach((l, k) => {
+        mcs.push(mkMC(`¿Cómo se llama el nivel de capacidad ${k}?`, l, sh(L.filter(x => x != l)).slice(0, 3)));
+      });
+      const acrs = sh(ACR_POOL).slice(0, 2).map(mkAcronym);
+      const tfs = sh(TF_POOL).slice(0, 2).map(x => mkTF(x[0], x[1]));
+      const ord = mkOrder(Math.floor(Math.random() * ORDER_CHALLENGES.length));
+      const cls = mkClassify(5);
+      return sh([cls, ord, ...acrs, ...tfs, ...sh(mcs).slice(0, 2)]);
+    }
+
+    function buildEvItems() {
+      const cls = mkClassify(6);
+      const ord1 = mkOrder(0);
+      const ord2 = mkOrder(1);
+      const acrs = sh(ACR_POOL).slice(0, 2).map(mkAcronym);
+      const tfs = sh(TF_POOL).slice(0, 2).map(x => mkTF(x[0], x[1]));
+      const mcs = sh(E_MC).slice(0, 5).map(e => mkMC(e[0], e[1], e.slice(2)));
+      return sh([cls, ord1, ord2, ...acrs, ...tfs, ...mcs]);
+    }
+
+    // ==========================================
+    // ESTADO Y CRONÓMETRO DE PARTIDAS
+    // ==========================================
+    let R = {};
+    let timers = { act: null, ev: null };
+
+    function fmtTime(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, "0");
+      const s = String(sec % 60).padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function startTimer(key) {
+      if (timers[key]) clearInterval(timers[key]);
+      R[key].startTime = Date.now();
+      R[key].timeSec = 0;
+      timers[key] = setInterval(() => {
+        if (R[key].finished) return;
+        R[key].timeSec = Math.max(1, Math.floor((Date.now() - R[key].startTime) / 1000));
+        const tEl = $("t-" + key);
+        if (tEl) tEl.textContent = fmtTime(R[key].timeSec);
+        if (key === "ev") {
+          const pot = Math.max(1200, 2500 - R[key].timeSec * 3);
+          if ($("p-ev")) $("p-ev").textContent = pot;
+        }
+      }, 1000);
+    }
+
+    function updateHud(key) {
+      const st = R[key];
+      if (!st) return;
+      if (key === "act") {
+        const doneCount = st.items.filter(x => x.done).length;
+        $("s-act").textContent = "x" + st.streak;
+        $("p-act").textContent = st.score;
+        $("pr-act").textContent = `${doneCount}/${st.items.length}`;
+      } else {
+        const ansCount = st.items.filter(x => isAnswered(x)).length;
+        const hp = Math.max(5, Math.round(100 - (ansCount / st.items.length) * 90));
+        $("hp-ev").textContent = hp + "%";
+        $("boss-bar").style.width = hp + "%";
+      }
+    }
+
+    function isAnswered(it) {
+      if (it.type === "mc" || it.type === "tf") return it.c >= 0;
+      if (it.type === "classify") return it.items.every(x => x.placed >= 0);
+      if (it.type === "order") return true;
+      if (it.type === "acronym") return it.val.trim().length > 0;
+      return false;
+    }
+
+    function checkItemCorrect(it) {
+      if (it.type === "mc" || it.type === "tf") return it.c === it.a;
+      if (it.type === "classify") return it.items.every(x => x.placed === x.cat);
+      if (it.type === "order") return it.cur.every((v, idx) => v === it.target[idx]);
+      if (it.type === "acronym") return it.val.trim().toUpperCase() === it.ans.toUpperCase();
+      return false;
+    }
+
+    function getItemSummary(it) {
+      if (it.type === "mc" || it.type === "tf") {
+        return {
+          yours: it.c < 0 ? "(sin responder)" : it.o[it.c],
+          correct: it.o[it.a]
+        };
+      }
+      if (it.type === "classify") {
+        return {
+          yours: it.items.map(x => `${x.code}→${x.placed >= 0 ? CAT[x.placed] : "?"}`).join(", "),
+          correct: it.items.map(x => `${x.code}→${CAT[x.cat]}`).join(", ")
+        };
+      }
+      if (it.type === "order") {
+        return {
+          yours: it.cur.join(" → "),
+          correct: it.target.join(" → ")
+        };
+      }
+      if (it.type === "acronym") {
+        return {
+          yours: it.val.trim() ? it.val.trim().toUpperCase() : "(sin responder)",
+          correct: it.ans
+        };
+      }
+      return { yours: "", correct: "" };
+    }
+
+    function registerInstantResult(key, it, feedbackEl) {
+      if (it.done) return;
+      it.done = true;
+      it.isOk = checkItemCorrect(it);
+      const st = R[key];
+      if (it.isOk) {
+        st.streak++;
+        if (st.streak > st.maxStreak) st.maxStreak = st.streak;
+        const gained = it.pts + (st.streak * 25) - (it.hintUsed ? 40 : 0);
+        st.score += Math.max(50, gained);
+        if (feedbackEl) {
+          feedbackEl.innerHTML = `<span style="color:var(--ok);font-weight:bold">✔ ¡CORRECTO! +${Math.max(50, gained)} pts (Racha x${st.streak})</span>`;
+        }
+      } else {
+        st.streak = 0;
+        const sum = getItemSummary(it);
+        if (feedbackEl) {
+          feedbackEl.innerHTML = `<span style="color:var(--bad);font-weight:bold">✘ Incorrecto. Respuesta correcta: ${sum.correct}</span>`;
+        }
+      }
+      updateHud(key);
+    }
+
+    // ==========================================
+    // RENDERIZADO DE PREGUNTAS Y MINIJUEGOS
+    // ==========================================
+    function render(box, items, instant, key, title) {
+      const c = $(box);
+      c.innerHTML = "";
+      R[key] = {
+        items,
+        title,
+        score: 0,
+        streak: 0,
+        maxStreak: 0,
+        timeSec: 0,
+        finished: false
+      };
+      startTimer(key);
+      updateHud(key);
+
+      items.forEach((it, i) => {
+        const d = document.createElement("div");
+        d.className = "q";
+        d.id = `q-${key}-${i}`;
+
+        const head = document.createElement("div");
+        head.className = "q-head";
+        head.innerHTML = `<span class="q-badge">${it.badge}</span><span class="px" style="font-size:9px">+${it.pts} PTS</span>`;
+        d.appendChild(head);
+
+        const titleEl = document.createElement("b");
+        titleEl.textContent = `${i + 1}. ${it.q}`;
+        d.appendChild(titleEl);
+
+        const bodyEl = document.createElement("div");
+        const fbEl = document.createElement("div");
+        fbEl.style.marginTop = "8px";
+        fbEl.id = `fb-${key}-${i}`;
+
+        // 1. OPCIÓN MÚLTIPLE O VERDADERO/FALSO
+        if (it.type === "mc" || it.type === "tf") {
+          const wrap = document.createElement("div");
+          if (it.type === "tf") wrap.className = "tf-grid";
+          it.o.forEach((t, k) => {
+            const b = document.createElement("button");
+            b.className = "o";
+            b.textContent = t;
+            b.onclick = () => {
+              if (it.done) return;
+              it.c = k;
+              if (instant) {
+                [...wrap.querySelectorAll(".o")].forEach((x, n) => {
+                  if (n === it.a) x.classList.add("ok");
+                  else if (n === k) x.classList.add("bad");
+                });
+                registerInstantResult(key, it, fbEl);
+              } else {
+                [...wrap.querySelectorAll(".o")].forEach((x, n) => x.classList.toggle("sel", n === k));
+                updateHud(key);
+              }
+            };
+            wrap.appendChild(b);
+          });
+          bodyEl.appendChild(wrap);
+        }
+
+        // 2. CLASIFICAR EN EL CASTILLO (DRAG & DROP + TAP)
+        else if (it.type === "classify") {
+          const renderClassifyUI = () => {
+            bodyEl.innerHTML = "";
+            const pool = document.createElement("div");
+            pool.className = "cls-pool";
+            pool.innerHTML = `<div style="width:100%;font-size:18px;color:var(--ro)">Procesos por ubicar (arrástralos o tócalos y luego toca una categoría):</div>`;
+
+            it.items.forEach((ch, idx) => {
+              if (ch.placed === -1) {
+                const chip = createChipEl(ch, idx);
+                pool.appendChild(chip);
+              }
+            });
+            bodyEl.appendChild(pool);
+
+            const zones = document.createElement("div");
+            zones.className = "cls-zones";
+            CAT.forEach((catName, catIdx) => {
+              const z = document.createElement("div");
+              z.className = "cls-zone";
+              z.innerHTML = `<div class="cls-zone-title">${catIdx === 0 ? "👑" : catIdx === 1 ? "📋" : "⚙️"} ${catName}</div>`;
+              const zItems = document.createElement("div");
+              zItems.className = "cls-zone-items";
+
+              it.items.forEach((ch, idx) => {
+                if (ch.placed === catIdx) {
+                  zItems.appendChild(createChipEl(ch, idx));
+                }
+              });
+              z.appendChild(zItems);
+
+              // Drag events
+              z.ondragover = e => { if (!it.done) { e.preventDefault(); z.classList.add("drag-over"); } };
+              z.ondragleave = () => z.classList.remove("drag-over");
+              z.ondrop = e => {
+                if (it.done) return;
+                e.preventDefault();
+                z.classList.remove("drag-over");
+                const chipIdx = Number(e.dataTransfer.getData("text/plain"));
+                if (!isNaN(chipIdx) && it.items[chipIdx]) {
+                  it.items[chipIdx].placed = catIdx;
+                  it.selectedChip = -1;
+                  renderClassifyUI();
+                  updateHud(key);
+                }
+              };
+
+              // Tap / Click to place selected chip
+              z.onclick = e => {
+                if (it.done) return;
+                if (e.target.closest(".chip")) return;
+                if (it.selectedChip >= 0) {
+                  it.items[it.selectedChip].placed = catIdx;
+                  it.selectedChip = -1;
+                  renderClassifyUI();
+                  updateHud(key);
+                }
+              };
+
+              zones.appendChild(z);
+            });
+            bodyEl.appendChild(zones);
+
+            if (instant && !it.done) {
+              const btnCheck = document.createElement("button");
+              btnCheck.className = "btn sm";
+              btnCheck.style.marginTop = "8px";
+              btnCheck.textContent = "✔ COMPROBAR CLASIFICACIÓN";
+              btnCheck.onclick = () => {
+                if (it.items.some(x => x.placed === -1)) {
+                  fbEl.innerHTML = `<span style="color:var(--bad)">Ubica todos los procesos en una categoría antes de comprobar.</span>`;
+                  return;
+                }
+                registerInstantResult(key, it, fbEl);
+                renderClassifyUI();
+              };
+              bodyEl.appendChild(btnCheck);
+            }
+          };
+
+          const createChipEl = (ch, idx) => {
+            const chip = document.createElement("div");
+            chip.className = "chip" + (it.selectedChip === idx ? " active-chip" : "");
+            if (it.done) {
+              chip.className += (ch.placed === ch.cat ? " ok-chip" : " bad-chip");
+            }
+            chip.draggable = !it.done;
+            chip.innerHTML = `<b>${ch.code}</b> <span style="font-size:18px">(${ch.name})</span>`;
+            chip.ondragstart = e => {
+              if (it.done) return;
+              e.dataTransfer.setData("text/plain", String(idx));
+            };
+            chip.onclick = () => {
+              if (it.done) return;
+              it.selectedChip = (it.selectedChip === idx) ? -1 : idx;
+              renderClassifyUI();
+            };
+            return chip;
+          };
+
+          it.refreshUI = renderClassifyUI;
+          renderClassifyUI();
+        }
+
+        // 3. ORDENAR SECUENCIA
+        else if (it.type === "order") {
+          const renderOrderUI = () => {
+            bodyEl.innerHTML = "";
+            const list = document.createElement("div");
+            list.className = "ord-list";
+            it.cur.forEach((stepText, idx) => {
+              const row = document.createElement("div");
+              row.className = "ord-item";
+              if (it.done) {
+                row.className += (stepText === it.target[idx] ? " ok-ord" : " bad-ord");
+              }
+              row.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span class="ord-num">${idx + 1}</span>
+                  <span>${stepText}</span>
+                </div>
+              `;
+              if (!it.done) {
+                const btns = document.createElement("div");
+                btns.className = "ord-btns";
+                const bUp = document.createElement("button");
+                bUp.textContent = "▲";
+                bUp.disabled = idx === 0;
+                bUp.onclick = () => {
+                  [it.cur[idx - 1], it.cur[idx]] = [it.cur[idx], it.cur[idx - 1]];
+                  renderOrderUI();
+                };
+                const bDn = document.createElement("button");
+                bDn.textContent = "▼";
+                bDn.disabled = idx === it.cur.length - 1;
+                bDn.onclick = () => {
+                  [it.cur[idx + 1], it.cur[idx]] = [it.cur[idx], it.cur[idx + 1]];
+                  renderOrderUI();
+                };
+                btns.appendChild(bUp);
+                btns.appendChild(bDn);
+                row.appendChild(btns);
+              }
+              list.appendChild(row);
+            });
+            bodyEl.appendChild(list);
+
+            if (instant && !it.done) {
+              const btnCheck = document.createElement("button");
+              btnCheck.className = "btn sm";
+              btnCheck.style.marginTop = "8px";
+              btnCheck.textContent = "✔ COMPROBAR ORDEN";
+              btnCheck.onclick = () => {
+                registerInstantResult(key, it, fbEl);
+                renderOrderUI();
+              };
+              bodyEl.appendChild(btnCheck);
+            }
+          };
+          it.refreshUI = renderOrderUI;
+          renderOrderUI();
+        }
+
+        // 4. DESCIFRAR SIGLA
+        else if (it.type === "acronym") {
+          const acrWrap = document.createElement("div");
+          acrWrap.className = "acr-box";
+
+          const inp = document.createElement("input");
+          inp.placeholder = "_ ".repeat(it.ans.length).trim();
+          inp.maxLength = it.ans.length + 2;
+          inp.style.width = "160px";
+          inp.style.textTransform = "uppercase";
+          inp.oninput = () => {
+            it.val = inp.value;
+            updateHud(key);
+          };
+          acrWrap.appendChild(inp);
+
+          const hintDiv = document.createElement("div");
+          hintDiv.className = "acr-hint";
+
+          const btnHint = document.createElement("button");
+          btnHint.className = "btn sm alt";
+          btnHint.textContent = "💡 PISTA (-40 pts)";
+          btnHint.onclick = () => {
+            if (it.done) return;
+            it.hintUsed = true;
+            const masked = it.ans[0] + " " + it.ans.slice(1).split("").map((ch, idx, arr) => idx === arr.length - 1 ? ch : "_").join(" ");
+            hintDiv.textContent = `Pista: Empieza con "${it.ans[0]}" (${masked})`;
+          };
+          acrWrap.appendChild(btnHint);
+
+          if (instant) {
+            const btnCheck = document.createElement("button");
+            btnCheck.className = "btn sm";
+            btnCheck.textContent = "✔ COMPROBAR";
+            btnCheck.onclick = () => {
+              if (!it.val.trim()) return;
+              inp.disabled = true;
+              btnCheck.disabled = true;
+              btnHint.disabled = true;
+              registerInstantResult(key, it, fbEl);
+            };
+            acrWrap.appendChild(btnCheck);
+          }
+
+          bodyEl.appendChild(acrWrap);
+          bodyEl.appendChild(hintDiv);
+          it.inpEl = inp;
+        }
+
+        d.appendChild(bodyEl);
+        d.appendChild(fbEl);
+        c.appendChild(d);
+      });
+
+      const f = document.createElement("div");
+      f.className = "box";
+      f.innerHTML = `
+        👤 Nombre para el TOP:
+        <input id="n${key}" maxlength="35" placeholder="Jugador 1" value="${playerAlias}">
+        <button class="btn" onclick="fin('${key}',${instant})">🏁 TERMINAR Y GUARDAR EN TOP</button>
+      `;
+      c.appendChild(f);
+    }
+
+    function startAct() {
+      $("actr").innerHTML = "";
+      render("actq", buildActItems(), true, "act", "Misión de Práctica MoProSoft");
+    }
+
+    function startEv() {
+      $("evr").innerHTML = "";
+      $("boss-bar").style.width = "100%";
+      $("hp-ev").textContent = "100%";
+      render("evq", buildEvItems(), false, "ev", "Evaluación Jefe Final MoProSoft");
+    }
+
+    async function fin(key, instant) {
+      const r = R[key];
+      if (!r) return;
+      r.finished = true;
+      if (timers[key]) clearInterval(timers[key]);
+
+      const nm = ($("n" + key).value || playerAlias || "Jugador").trim();
+      saveAlias(nm);
+      if ($("globalName")) $("globalName").value = nm;
+
+      let ok = 0;
+      let totalScore = 0;
+      let curStreak = 0;
+      let maxStreak = 0;
+
+      r.items.forEach((it, i) => {
+        const fbEl = $(`fb-${key}-${i}`);
+        if (!it.done) {
+          it.done = true;
+          it.isOk = checkItemCorrect(it);
+        }
+        if (it.isOk) {
+          ok++;
+          curStreak++;
+          if (curStreak > maxStreak) maxStreak = curStreak;
+          totalScore += Math.max(50, it.pts + curStreak * 25 - (it.hintUsed ? 40 : 0));
+        } else {
+          curStreak = 0;
+        }
+
+        // Mostrar retroalimentación visual al finalizar
+        const card = $(`q-${key}-${i}`);
+        if (it.type === "mc" || it.type === "tf") {
+          [...card.querySelectorAll(".o")].forEach((x, k) => {
+            x.classList.remove("sel");
+            if (k === it.a) x.classList.add("ok");
+            else if (k === it.c) x.classList.add("bad");
+          });
+        } else if (it.refreshUI) {
+          it.refreshUI();
+        } else if (it.inpEl) {
+          it.inpEl.disabled = true;
+        }
+
+        if (fbEl && !instant) {
+          const sum = getItemSummary(it);
+          fbEl.innerHTML = it.isOk
+            ? `<span style="color:var(--ok);font-weight:bold">✔ ¡CORRECTO!</span>`
+            : `<span style="color:var(--bad);font-weight:bold">✘ Incorrecto. Correcta: ${sum.correct}</span>`;
+        }
+      });
+
+      const n = r.items.length;
+      const g = Math.round((ok / n) * 100);
+      // Bonus de velocidad proporcional al porcentaje de aciertos
+      const speedBonus = ok > 0 ? Math.round(Math.max(0, 600 - r.timeSec * 3) * (ok / n)) : 0;
+      const finalScore = instant ? (r.score + speedBonus) : (totalScore + speedBonus);
+
+      r.name = nm;
+      r.ok = ok;
+      r.pct = g;
+      r.score = finalScore;
+      r.maxStreak = instant ? Math.max(r.maxStreak, maxStreak) : maxStreak;
+
+      if (key === "ev") {
+        const bossLeft = Math.max(0, 100 - g);
+        $("hp-ev").textContent = bossLeft + "%";
+        $("boss-bar").style.width = bossLeft + "%";
+      }
+
+      const msg = g >= 85
+        ? "🏆 ¡LEYENDA DE MOPROSOFT! Has derrotado el caos y dominado la norma."
+        : g >= 65
+        ? "⚔️ ¡Gran partida! Dominas la mayoría de procesos."
+        : "🛡️ Sigue entrenando en los 12 niveles e inténtalo de nuevo.";
+
+      const resBox = $(key == "act" ? "actr" : "evr");
+      resBox.innerHTML = `
+        <div class="box hero">
+          <h2 style="color:#fff">${nm}: ${finalScore} PTS · ${ok}/${n} (${g}%)</h2>
+          <p style="font-size:22px">⏱️ Tiempo: ${fmtTime(r.timeSec)} (+${speedBonus} pts velocidad) · 🔥 Racha máx: x${r.maxStreak}</p>
+          <p>${msg}</p>
+          <div id="save-msg-${key}" style="font-size:20px;color:var(--gold);margin:8px 0">Guardando resultado en la base de datos...</div>
+          <button class="btn" onclick="pdf('${key}')">⬇ DESCARGAR PDF</button>
+          <button class="btn gold" onclick="go('top')">🏆 VER TOP RANKING</button>
+          <button class="btn alt" onclick="${key == "act" ? "startAct" : "startEv"}()">↻ JUGAR OTRA VEZ</button>
+        </div>
+      `;
+      resBox.scrollIntoView({ behavior: "smooth" });
+
+      // Guardar en Base de Datos (Netlify Blobs + Respaldo Local)
+      const saved = await saveScoreToDB({
+        name: nm,
+        mode: key,
+        score: finalScore,
+        ok,
+        total: n,
+        pct: g,
+        timeSec: r.timeSec || 1,
+        streak: r.maxStreak
+      });
+
+      const msgEl = $(`save-msg-${key}`);
+      if (msgEl) {
+        if (saved.remote && saved.rank) {
+          msgEl.innerHTML = `🌟 ¡Resultado guardado en la nube! Estás en el <b>Puesto #${saved.rank}</b> del TOP.`;
+        } else {
+          msgEl.innerHTML = `💾 Resultado registrado en el TOP (${saved.rank ? "Puesto #" + saved.rank : "Guardado"}).`;
+        }
+      }
+    }
+
+    // ==========================================
+    // BASE DE DATOS Y RANKING (NETLIFY + LOCAL)
+    // ==========================================
+    let curTopFilter = "all";
+    const LOCAL_DB_KEY = "moprosoft_top_scores_v2";
+
+    function getLocalScores() {
+      try {
+        const raw = localStorage.getItem(LOCAL_DB_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setLocalScores(list) {
+      try {
+        localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(list.slice(0, 100)));
+      } catch (e) { }
+    }
+
+    function sortLeaderboard(list) {
+      return list.slice().sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        if (b.pct !== a.pct) return b.pct - a.pct;
+        return (a.timeSec || 9999) - (b.timeSec || 9999);
+      });
+    }
+
+    async function saveScoreToDB(payload) {
+      const localEntry = {
+        ...payload,
+        id: "loc-" + Date.now(),
+        date: new Date().toISOString()
+      };
+      const localList = sortLeaderboard([...getLocalScores(), localEntry]);
+      setLocalScores(localList);
+
+      try {
+        const res = await fetch("/.netlify/functions/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && Array.isArray(data.scores)) {
+            setLocalScores(data.scores);
+            return { remote: true, rank: data.rank, scores: data.scores };
+          }
+        }
+      } catch (e) { }
+
+      const modeList = localList.filter(s => s.mode === payload.mode);
+      const rank = modeList.findIndex(s => s.id === localEntry.id) + 1;
+      return { remote: false, rank, scores: localList };
+    }
+
+    async function loadTop(filterMode = "all") {
+      curTopFilter = filterMode;
+      ["all", "ev", "act"].forEach(m => {
+        const btn = $("f-" + m);
+        if (btn) btn.classList.toggle("alt", m !== filterMode);
+      });
+
+      const statusEl = $("db-status");
+      const wrap = $("top-list");
+      let scores = getLocalScores();
+      let isCloud = false;
+
+      try {
+        const res = await fetch(`/.netlify/functions/scores?mode=${encodeURIComponent(filterMode)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && Array.isArray(data.scores)) {
+            scores = data.scores;
+            isCloud = true;
+          }
+        }
+      } catch (e) { }
+
+      if (statusEl) {
+        statusEl.textContent = isCloud ? "☁️ BD NETLIFY CONECTADA" : "💾 MODO LOCAL / OFFLINE";
+        statusEl.style.background = isCloud ? "var(--ok-bg)" : "#fff3c4";
+      }
+
+      let filtered = sortLeaderboard(scores);
+      if (filterMode !== "all") {
+        filtered = filtered.filter(s => s.mode === filterMode);
+      }
+
+      if (!filtered.length) {
+        wrap.innerHTML = `<div class="box" style="text-align:center">Aún no hay registros en esta categoría. ¡Sé el primero en completar una partida!</div>`;
+        return;
+      }
+
+      const rows = filtered.slice(0, 30).map((s, idx) => {
+        const medal = idx === 0 ? "🥇 #1" : idx === 1 ? "🥈 #2" : idx === 2 ? "🥉 #3" : `#${idx + 1}`;
+        const isMe = playerAlias && s.name.toLowerCase() === playerAlias.toLowerCase();
+        const modeTag = s.mode === "act"
+          ? `<span class="badge-mode badge-act">PRÁCTICA</span>`
+          : `<span class="badge-mode badge-ev">JEFE FINAL</span>`;
+        const dateStr = s.date ? new Date(s.date).toLocaleDateString("es-MX", { day: "2-digit", month: "short" }) : "-";
+        return `
+          <tr class="${isMe ? "me-row" : ""}">
+            <td><b>${medal}</b></td>
+            <td>${escapeHtml(s.name)}</td>
+            <td>${modeTag}</td>
+            <td><b>⭐ ${s.score}</b></td>
+            <td>${s.ok}/${s.total} (${s.pct}%)</td>
+            <td>🔥 x${s.streak || 0}</td>
+            <td>⏱️ ${fmtTime(s.timeSec || 0)}</td>
+            <td>${dateStr}</td>
+          </tr>
+        `;
+      }).join("");
+
+      wrap.innerHTML = `
+        <table class="top-table">
+          <thead>
+            <tr>
+              <th>PUESTO</th>
+              <th>JUGADOR</th>
+              <th>MODO</th>
+              <th>PUNTOS</th>
+              <th>ACIERTOS</th>
+              <th>RACHA</th>
+              <th>TIEMPO</th>
+              <th>FECHA</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    // ==========================================
+    // EXPORTAR REPORTE PDF
+    // ==========================================
+    async function pdf(key) {
+      const r = R[key];
+      if (!window.jspdf) { alert("No se pudo cargar el generador de PDF."); return; }
+      const doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+      let y = 20;
+      const line = (t, s, b) => {
+        doc.setFont("helvetica", b ? "bold" : "normal");
+        doc.setFontSize(s);
+        doc.splitTextToSize(String(t), 175).forEach(l => {
+          if (y > 280) { doc.addPage(); y = 20; }
+          doc.text(l, 17, y);
+          y += s * 0.5 + 1.5;
+        });
+      };
+      line("MoProSoft Quest - " + r.title, 16, 1); y += 2;
+      line("Jugador: " + r.name, 11);
+      line("Fecha: " + new Date().toLocaleString("es-MX"), 11);
+      line(`Puntuación Total: ${r.score} PTS | Tiempo: ${fmtTime(r.timeSec)} | Racha máx: x${r.maxStreak}`, 11, 1);
+      line(`Aciertos: ${r.ok}/${r.items.length} (${r.pct}%)`, 12, 1); y += 4;
+
+      r.items.forEach((it, i) => {
+        const sum = getItemSummary(it);
+        line(`${i + 1}. [${it.type.toUpperCase()}] ${it.q}`, 10.5, 1);
+        line("Tu respuesta: " + sum.yours + (it.isOk ? "  [CORRECTA]" : "  [INCORRECTA]"), 10);
+        if (!it.isOk) line("Correcta: " + sum.correct, 10);
+        y += 3;
+      });
+      y += 4; line("Hecho por Rum - MoProSoft Quest", 9);
+      const fname = `moprosoft_${key == "act" ? "practica" : "evaluacion"}.pdf`;
+      try { doc.save(fname); } catch (_) { }
+    }
+
+    if ($("globalName")) $("globalName").value = playerAlias;
+    startAct();
+    startEv();
+    hv();
+    addEventListener("hashchange", hv);
+  </script>
+</body>
+
+</html>
