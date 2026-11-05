@@ -78,17 +78,21 @@
       justify-content: center
     }
 
-    nav button {
+    nav button,
+    nav a {
       font: 10px 'Press Start 2P', monospace;
       background: var(--ro);
       color: var(--wh);
       border: 3px solid var(--wh);
       padding: 8px;
-      cursor: pointer
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block
     }
 
     nav button:hover,
-    nav button.act {
+    nav button.act,
+    nav a:hover {
       background: var(--az);
       color: var(--dk)
     }
@@ -588,7 +592,8 @@
           <input id="globalName" maxlength="30" placeholder="Jugador 1" style="max-width:220px" oninput="saveAlias(this.value)">
         </div>
         <button class="btn" onclick="go('index')">PRESS START</button>
-        <button class="btn gold" onclick="go('top')">🏆 VER TOP RANKING</button>
+        <a class="btn alt" href="evaluacion.html" style="text-decoration:none;display:inline-block">⚔️ EVALUACIÓN (30 PREGUNTAS)</a>
+        <a class="btn gold" href="evaluacion.html#top-ev" style="text-decoration:none;display:inline-block">🏆 TOP EVALUACIÓN</a>
       </div>
     </section>
 
@@ -610,7 +615,8 @@
       <div class="box">
         Supera <b>8 retos variados</b> (Clasificar en el castillo, Ordenar secuencias, Descifrar siglas, V/F y Opción Múltiple) con retroalimentación inmediata, racha y bonus de tiempo.<br>
         <button class="btn" onclick="startAct()">🎮 NUEVA MISIÓN</button>
-        <button class="btn gold" onclick="go('top')">🏆 RANKING</button>
+        <a class="btn alt" href="evaluacion.html" style="text-decoration:none;display:inline-block">⚔️ IR A EVALUACIÓN FINAL (30)</a>
+        <button class="btn gold" onclick="go('top')">🏆 RANKING PRÁCTICA</button>
       </div>
       <div class="hud" id="hud-act">
         <div>⏱️ TIEMPO: <span class="val" id="t-act">00:00</span></div>
@@ -622,34 +628,14 @@
       <div id="actr"></div>
     </section>
 
-    <section id="evaluacion">
-      <h2>☠ EVALUACIÓN: JEFE FINAL</h2>
-      <div class="box">
-        Enfrenta al <b>Jefe Final de MoProSoft</b> con <b>12 desafíos combinados</b>. Tus respuestas se califican al entregar para calcular tu puntuación final, bonus de velocidad y posición en el <b>TOP Global</b>.<br>
-        <button class="btn" onclick="startEv()">⚔️ NUEVA BATALLA</button>
-        <button class="btn gold" onclick="go('top')">🏆 RANKING</button>
-      </div>
-      <div class="hud" id="hud-ev">
-        <div>⏱️ TIEMPO: <span class="val" id="t-ev">00:00</span></div>
-        <div>👾 JEFE HP: <span class="val" id="hp-ev">100%</span></div>
-        <div>⭐ POTENCIAL: <span class="val" id="p-ev">2500</span></div>
-      </div>
-      <div class="box" style="padding:8px 12px">
-        <div class="px" style="font-size:9px;margin-bottom:4px">👾 CAOS DE PROCESOS (HP DEL JEFE SEGÚN RETOS RESPONDIDOS)</div>
-        <div class="bar boss"><i id="boss-bar" style="width:100%"></i></div>
-      </div>
-      <div id="evq"></div>
-      <div id="evr"></div>
-    </section>
-
     <section id="top">
       <h2>🏆 TOP PARTICIPANTES / SALÓN DE LA FAMA</h2>
       <div class="box">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
           <div>
             <button class="btn sm" id="f-all" onclick="loadTop('all')">🌐 TODOS</button>
-            <button class="btn sm alt" id="f-ev" onclick="loadTop('ev')">☠ JEFE FINAL</button>
             <button class="btn sm alt" id="f-act" onclick="loadTop('act')">★ PRÁCTICA</button>
+            <a class="btn sm gold" href="evaluacion.html#top-ev" style="text-decoration:none;display:inline-block">🏆 IR AL TOP EXCLUSIVO DE EVALUACIÓN (30)</a>
           </div>
           <div>
             <span id="db-status" class="status-pill">Conectando...</span>
@@ -667,17 +653,18 @@
     const $ = i => document.getElementById(i);
     const sh = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]] } return a };
     let last = 0;
-    const PG = ["inicio", "index", "contenido", "actividad", "evaluacion", "top"];
+    const PG = ["inicio", "index", "contenido", "actividad", "top"];
 
     // Alias persistente
     let playerAlias = localStorage.getItem("moprosoft_alias") || "";
     function saveAlias(v) {
       playerAlias = v.trim();
       localStorage.setItem("moprosoft_alias", playerAlias);
-      ["nact", "nev"].forEach(id => { if ($(id) && !$(id).value) $(id).value = playerAlias; });
+      ["nact"].forEach(id => { if ($(id) && !$(id).value) $(id).value = playerAlias; });
     }
 
     const go = id => {
+      if (id === "evaluacion") { location.href = "evaluacion.html"; return; }
       if (!PG.includes(id)) id = "inicio";
       PG.forEach(p => { $(p).classList.toggle("on", p == id); });
       document.querySelectorAll("nav button").forEach(b => b.classList.toggle("act", b.dataset.p == id));
@@ -729,9 +716,10 @@
       ["index", "ÍNDICE"],
       ["contenido", "CONTENIDO"],
       ["actividad", "ACTIVIDAD"],
-      ["evaluacion", "EVALUACIÓN"],
       ["top", "🏆 TOP"]
-    ].map(a => `<button data-p="${a[0]}" onclick="nv('${a[0]}')">${a[1]}</button>`).join("");
+    ].map(a => `<button data-p="${a[0]}" onclick="nv('${a[0]}')">${a[1]}</button>`).join("") +
+    `<a href="evaluacion.html">⚔️ EVALUACIÓN (30)</a>` +
+    `<a href="evaluacion.html#top-ev" style="background:var(--gold);color:var(--dk)">🏆 TOP EVALUACIÓN</a>`;
 
     $("idx").innerHTML = C.map((c, i) => `<button class="lv" id="lv${i}" onclick="open_(${i})"><span>${c[0]}</span><div class="px" style="font-size:9px;margin:6px 0">NIVEL ${i + 1}</div>${c[1]}</button>`).join("");
 
@@ -1623,7 +1611,6 @@
 
     if ($("globalName")) $("globalName").value = playerAlias;
     startAct();
-    startEv();
     hv();
     addEventListener("hashchange", hv);
   </script>
